@@ -4,8 +4,8 @@ NoZak Labs AI Radar Agent — main entry point.
 Pipeline:
     1. Fetch items from all configured sources
     2. Score each item via Claude against NoZak Labs context
-    3. Write scored items to Notion database
-    4. Write radar.md digest to repo root
+    3. Write radar.md (durable archive)
+    4. Send email digest via Gmail SMTP
 
 Run locally:
     python -m src.main
@@ -23,11 +23,13 @@ from pathlib import Path
 # Allow running both as `python -m src.main` and `python src/main.py`
 if __package__ is None or __package__ == "":
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from src.outputs import push_to_notion, write_radar_md
+    from src.email_digest import send_email_digest
+    from src.outputs import write_radar_md
     from src.scorer import score_items
     from src.sources import fetch_all_sources
 else:
-    from .outputs import push_to_notion, write_radar_md
+    from .email_digest import send_email_digest
+    from .outputs import write_radar_md
     from .scorer import score_items
     from .sources import fetch_all_sources
 
@@ -45,7 +47,7 @@ def setup_logging() -> None:
 
 def check_environment() -> None:
     """Fail fast if required env vars are missing."""
-    required = ["ANTHROPIC_API_KEY", "NOTION_TOKEN", "NOTION_DATABASE_ID"]
+    required = ["ANTHROPIC_API_KEY", "GMAIL_USER", "GMAIL_APP_PASSWORD"]
     missing = [v for v in required if not os.environ.get(v)]
     if missing:
         raise RuntimeError(
@@ -83,9 +85,11 @@ def main() -> int:
 
     # 3. Write outputs
     log.info("Step 3/3: Writing outputs…")
-    push_to_notion(scored)
+    # Write radar.md FIRST — that's the durable archive
     radar_path = Path(__file__).resolve().parent.parent / "radar.md"
     write_radar_md(scored, radar_path)
+    # Then send email — if it fails, the archive still exists
+    send_email_digest(scored)
 
     log.info("✅ Radar run complete")
     return 0
