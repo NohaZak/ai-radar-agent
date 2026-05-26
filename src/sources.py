@@ -29,9 +29,9 @@ log = logging.getLogger(__name__)
 # Universal request timeout. RSS feeds and APIs sometimes hang.
 REQUEST_TIMEOUT = 15
 
-# How far back to look. We run twice a week (Mon + Fri), so 3-4 days covers
-# the gap. We use 4 days for safety, then dedupe.
-LOOKBACK_DAYS = 4
+# How far back to look. We run once a week on Sunday, so 7 days is the baseline.
+# We use 8 for a safety margin, then dedupe.
+LOOKBACK_DAYS = 8
 
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
