@@ -130,7 +130,7 @@ def _extract_json(text: str) -> dict | None:
 
 
 def _tier_from_score(score: int) -> str:
-    """Map a numeric score to the Notion Tier select value."""
+    """Map a numeric score to a tier label. Used by outputs and email_digest."""
     if score >= TIER_THRESHOLDS["act_now"]:
         return "🔥 Act Now"
     if score >= TIER_THRESHOLDS["watch"]:

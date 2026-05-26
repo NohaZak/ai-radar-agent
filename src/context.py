@@ -145,7 +145,7 @@ NOISE_FILTERS = [
 ]
 
 # ─── SCORING TIER DEFINITIONS ────────────────────────────────────────────────
-# These map to the "Tier" select in Notion. Used by scorer.py.
+# These thresholds are used by scorer.py to assign tier labels.
 
 TIER_THRESHOLDS = {
     "act_now": 75,    # Score ≥ 75 → 🔥 Act Now (review during 30-min slot)
