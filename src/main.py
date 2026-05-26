@@ -3,7 +3,7 @@ NoZak Labs AI Radar Agent — main entry point.
 
 Pipeline:
     1. Fetch items from all configured sources
-    2. Score each item via Claude against NoZak Labs context
+    2. Score each item via the AI scoring engine against NoZak Labs context
     3. Write radar.md (durable archive)
     4. Send email digest via Gmail SMTP
 
@@ -42,12 +42,12 @@ def setup_logging() -> None:
     )
     # Silence noisy libraries
     logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("anthropic").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 def check_environment() -> None:
     """Fail fast if required env vars are missing."""
-    required = ["ANTHROPIC_API_KEY", "GMAIL_USER", "GMAIL_APP_PASSWORD"]
+    required = ["AI_API_KEY", "GMAIL_USER", "GMAIL_APP_PASSWORD"]
     missing = [v for v in required if not os.environ.get(v)]
     if missing:
         raise RuntimeError(
@@ -77,7 +77,7 @@ def main() -> int:
     log.info(f"Fetched {len(items)} unique items")
 
     # 2. Score
-    log.info("Step 2/3: Scoring with Claude…")
+    log.info("Step 2/3: Scoring items…")
     scored = score_items(items)
     if not scored:
         log.warning("No items survived scoring threshold.")

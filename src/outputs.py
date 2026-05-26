@@ -23,7 +23,7 @@ def _md_section(title: str, items: list[dict]) -> str:
         out.append(
             f"- **[{it['title']}]({it['url']})** "
             f"`{it['score']}` · {it['source']} · {projects}  \n"
-            f"  {it.get('claude_summary', '')}  \n"
+            f"  {it.get('ai_summary', '')}  \n"
             f"  _Why it matters:_ {it.get('why_it_matters', '')}\n"
         )
     return "\n".join(out) + "\n"

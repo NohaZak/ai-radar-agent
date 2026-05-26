@@ -1,8 +1,8 @@
 """
-Scoring engine — calls Claude API to score every fetched item against the
+Scoring engine — calls the AI API to score every fetched item against the
 NoZak Labs project context.
 
-For each item, Claude returns structured JSON:
+For each item, the model returns structured JSON:
 
     {
         "score": int (0-100),
@@ -36,8 +36,8 @@ from .context import (
 
 log = logging.getLogger(__name__)
 
-# Claude model. Haiku is plenty for scoring — fast and cheap.
-SCORING_MODEL = "claude-haiku-4-5-20251001"
+# Scoring model — fast and cheap, well-suited for structured JSON extraction.
+_SCORING_MODEL = "claude-haiku-4-5-20251001"
 
 # Rate limit handling
 MAX_RETRIES = 3
@@ -151,7 +151,7 @@ def _score_one(client: anthropic.Anthropic, item: dict, system_prompt: str) -> d
     for attempt in range(MAX_RETRIES):
         try:
             response = client.messages.create(
-                model=SCORING_MODEL,
+                model=_SCORING_MODEL,
                 max_tokens=600,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_msg}],
@@ -174,9 +174,9 @@ def _score_one(client: anthropic.Anthropic, item: dict, system_prompt: str) -> d
 
 def score_items(items: list[dict]) -> list[dict]:
     """Score every item and return enriched list (filtered by MIN_SCORE_TO_KEEP)."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = os.environ.get("AI_API_KEY")
     if not api_key:
-        raise RuntimeError("ANTHROPIC_API_KEY not set in environment")
+        raise RuntimeError("AI_API_KEY not set in environment")
 
     client = anthropic.Anthropic(api_key=api_key)
     system_prompt = _build_system_prompt()
@@ -195,7 +195,7 @@ def score_items(items: list[dict]) -> list[dict]:
         item["score"] = score
         item["tier"] = _tier_from_score(score)
         item["project_match"] = result.get("project_match", []) or []
-        item["claude_summary"] = result.get("summary", "")
+        item["ai_summary"] = result.get("summary", "")
         item["why_it_matters"] = result.get("why_it_matters", "")
         scored.append(item)
 

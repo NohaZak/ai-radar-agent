@@ -6,19 +6,19 @@ This documents the one-time setup completed when this agent was built. Useful as
 
 ## Prerequisites
 
-- [x] **Anthropic API key** with billing enabled
+- [x] **AI API key** with billing enabled
 - [x] **Gmail account** with 2-Step Verification enabled
 - [x] **GitHub repo** with Actions enabled
 
 ---
 
-## 1. Anthropic API setup
+## 1. AI scoring API setup
 
-1. Sign up at [console.anthropic.com](https://console.anthropic.com)
-2. Add billing — $5 of prepaid credit is enough for ~6 months of radar runs
-3. Create an API key named `nozak-radar-agent`
+1. Obtain an API key from your AI scoring provider
+2. Add billing — a small prepaid credit is enough for months of radar runs
+3. Name the key `nozak-radar-agent` in the provider console
 4. Save the key in a password manager or Windows Credential Manager
-5. Add it to GitHub Actions secrets as `ANTHROPIC_API_KEY` (see step 3 below)
+5. Add it to GitHub Actions secrets as `AI_API_KEY` (see step 3 below)
 
 ---
 
@@ -51,7 +51,7 @@ Add three secrets:
 
 | Name | Value |
 |---|---|
-| `ANTHROPIC_API_KEY` | Your Anthropic API key |
+| `AI_API_KEY` | Your AI scoring API key |
 | `GMAIL_USER` | `noha@nozaklabs.com` |
 | `GMAIL_APP_PASSWORD` | 16-char Gmail App Password |
 
@@ -92,7 +92,7 @@ Step 1/3: Fetching from sources…
   Hacker News: N items
   Product Hunt: N items
   …
-Step 2/3: Scoring with Claude…
+Step 2/3: Scoring items…
   [1/N] Scoring: ...
 Step 3/3: Writing outputs…
   Wrote radar.md
@@ -127,7 +127,7 @@ You can manually trigger a run anytime from the Actions tab.
 
 | Item | Monthly cost |
 |---|---|
-| Anthropic API (Haiku 4.5, ~100 items × 1 run/week) | ~$0.15–0.50 |
+| AI scoring API (~100 items × 1 run/week) | ~$0.15–0.50 |
 | Gmail SMTP | $0 |
 | GitHub Actions (well within free 2000 min/month) | $0 |
 | **Total** | **~$0.15–0.50/month** |
@@ -143,7 +143,7 @@ You can manually trigger a run anytime from the Actions tab.
 | Authentication error in logs | 2FA not enabled on Google account | Enable 2FA, regenerate App Password |
 | Email lands in spam | First-time sender warmup | Mark "Not spam" once; Gmail learns |
 | Triage buttons don't open mail app on mobile | Default mail app not set | iOS: Settings → Mail → Default Mail App; Android: Settings → Apps → Default apps |
-| All scores are 0 | Claude returned malformed JSON | Check workflow logs, may be rate-limited |
+| All scores are 0 | Scoring API returned malformed JSON | Check workflow logs, may be rate-limited |
 | `radar.md` not updating in repo | Workflow lacks write permission | Verify `permissions: contents: write` is in workflow |
 
 ---
@@ -152,7 +152,7 @@ You can manually trigger a run anytime from the Actions tab.
 
 If a key is compromised:
 
-1. Revoke the old key in the source console (Anthropic console or Google App Passwords page)
+1. Revoke the old key in the source console (scoring API provider or Google App Passwords page)
 2. Generate a new key with the same name + `-v2`
 3. Update the corresponding GitHub Actions secret
 4. Update the password manager entry

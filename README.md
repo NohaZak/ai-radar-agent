@@ -17,12 +17,12 @@ Once a week (Sunday at 11:00 AM Cairo), this agent:
 
 1. **Fetches** items from 7 sources: Hacker News, Product Hunt, GitHub Trending, Ben's Bites, TLDR AI, Reddit (r/MachineLearning + r/SideProject), and Pega Community
 2. **Dedupes** by URL and filters to the last 8 days
-3. **Scores** every item against the NoZak Labs project context using **Claude Haiku 4.5**
+3. **Scores** every item against the NoZak Labs project context using an AI scoring model
 4. **Tags** items with project relevance (Brands of Eden, lurniALP, Hykers, SE Job Hunt, Cross-cutting)
 5. **Sends** an HTML email digest with one-tap triage actions (Adopt / Evaluate / Skip via mailto: Gmail filters)
 6. **Updates** `radar.md` in this repo and commits it back
 
-Total cost: **~$0.15/week (~$0.60/month)** in Claude API usage. Runs on GitHub Actions free tier.
+Total cost: **~$0.15/week (~$0.60/month)** in scoring API usage. Runs on GitHub Actions free tier.
 
 ---
 
@@ -41,7 +41,7 @@ Total cost: **~$0.15/week (~$0.60/month)** in Claude API usage. Runs on GitHub A
                          ▼
         ┌────────────────────────────────────┐
         │  src/scorer.py                     │
-        │  Claude Haiku 4.5 scores each item │
+        │  AI model scores each item         │
         │  against NoZak Labs context        │
         └────────────────┬───────────────────┘
                          ▼
@@ -95,7 +95,7 @@ What makes this useful isn't the score — it's the _Why it matters_ line. The a
 ## Tech stack
 
 - **Python 3.11**
-- **Anthropic Claude Haiku 4.5** for scoring
+- **AI scoring model** for relevance ranking
 - **Gmail SMTP** for the weekly digest
 - **GitHub Actions** for scheduling and execution
 - **feedparser + requests** for source fetching
@@ -112,7 +112,7 @@ ai-radar-agent/
 │   ├── __init__.py
 │   ├── context.py             # NoZak Labs project priorities (the agent's "brain")
 │   ├── sources.py             # Fetchers for each source
-│   ├── scorer.py              # Claude scoring engine
+│   ├── scorer.py              # AI scoring engine
 │   ├── outputs.py             # radar.md writer
 │   ├── email_digest.py        # Gmail SMTP digest sender
 │   └── main.py                # Orchestrator
@@ -135,17 +135,17 @@ pip install -r requirements.txt
 
 # Set env vars (use a .env file or your shell)
 # Windows cmd:
-set ANTHROPIC_API_KEY=sk-ant-...
+set AI_API_KEY=sk-...
 set GMAIL_USER=noha@nozaklabs.com
 set GMAIL_APP_PASSWORD=xxxx_xxxx_xxxx_xxxx
 
 # PowerShell:
-$env:ANTHROPIC_API_KEY="sk-ant-..."
+$env:AI_API_KEY="sk-..."
 $env:GMAIL_USER="noha@nozaklabs.com"
 $env:GMAIL_APP_PASSWORD="xxxx_xxxx_xxxx_xxxx"
 
 # Unix/macOS:
-export ANTHROPIC_API_KEY=sk-ant-...
+export AI_API_KEY=sk-...
 export GMAIL_USER=noha@nozaklabs.com
 export GMAIL_APP_PASSWORD=xxxx_xxxx_xxxx_xxxx
 
@@ -169,7 +169,7 @@ This is a living project. Active and planned improvements:
 - [ ] **Triage feedback loop** — parse Gmail labels (Radar/Adopt, Radar/Evaluate, Radar/Skip) and feed adoption rate back into the scorer as a quality signal
 - [ ] **Source quality feedback loop** — track which "Act Now" items actually convert to "Adopt" decisions, surface low-signal sources for pruning.
 - [ ] **Multi-tenant context** — generalize the agent so other solo operators can fork the repo, swap in their own `context.py`, and run the same pipeline against their own projects.
-- [ ] **Cost dashboard** — add a small monthly cost tracker that reads the Anthropic usage API and posts spend deltas alongside the digest.
+- [ ] **Cost dashboard** — add a small monthly cost tracker that reads the scoring API usage endpoint and posts spend deltas alongside the digest.
 - [ ] **Pega Community deep-dive source** — current Pega fetcher pulls the general RSS feed; tighten it to specifically surface Decisioning and Constellation content.
 
 ---
